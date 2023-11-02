@@ -10,10 +10,6 @@ const Analyze = () =>
   import ( /* webpackChunkName: "login_home_welcome" */ '../components/Analyze.vue')
 const Interface = () =>
   import ( /* webpackChunkName: "login_home_welcome" */ '../components/Interface.vue')
-const PageInterface = () =>
-  import ( /* webpackChunkName: "login_home_welcome" */ '../components/PageInterface.vue')
-const Article = () =>
-  import ( /* webpackChunkName: "login_home_welcome" */ '../components/Article.vue')
 const Hi = () =>
   import ( /* webpackChunkName: "login_home_welcome" */ '../components/Hi.vue')
 const routes = [
