@@ -41,7 +41,7 @@ mybatis-plus:
 reggie:
   path: D:\img\
 # springdoc-openapi项目配置
-#swaggerURL http://localhost:8081/swagger-ui/index:
+#swaggerURL http://localhost:8081/swagger-ui/index.html#/
   html#/:
 springdoc:
   swagger-ui:

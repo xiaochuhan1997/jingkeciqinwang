@@ -1,5 +1,7 @@
 package com.example.swagger.service.impl;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.SerializationUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.swagger.utils.JsonRefRemover;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.swagger.entity.SwaggerData;
@@ -172,14 +174,15 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
             }
         }
         //如果为json对象
-        else if (objJson instanceof JSONObject jsonObject) {
-
+        else if (objJson instanceof JSONObject) {
+            JSONObject jsonObject = (JSONObject) objJson;
             Iterator it = jsonObject.keys();
             while (it.hasNext()) {
                 String key = it.next().toString();
                 Object object = jsonObject.get(key);
                 //如果得到的是数组
-                if (object instanceof JSONArray objArray) {
+                if (object instanceof JSONArray) {
+                    JSONArray objArray = (JSONArray) object;
                     analysisJson(objArray);
                 }
                 //如果key中是一个json对象
@@ -192,7 +195,7 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                         ((JSONObject) object).put("$ref", jsonObjectTmp);
 
                     }
-                    analysisJson( object);
+                    analysisJson((JSONObject) object);
 
                 }
                 //如果key中是其他
@@ -222,6 +225,16 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
         }
     }
 
+    @Override
+    public IPage<SwaggerData> selectSwaggerDataPage(int current, int size) {
+        // 创建一个 Page 对象，用于分页查询
+        Page<SwaggerData> page = new Page<>(current, size);
+
+        // 调用 MyBatis-Plus 的分页查询方法
+        IPage<SwaggerData> pageResult = swaggerDataMapper.selectPage(page, null);
+
+        return pageResult;
+    }
 
 
 }

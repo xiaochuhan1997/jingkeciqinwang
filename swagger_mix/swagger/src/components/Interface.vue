@@ -53,19 +53,29 @@
       <el-table-column label="接口描述" prop="summary"/>
       <el-table-column label="接口所属分组" prop="tag"/>
     </el-table>
-    <el-pagination class="fy"
-                   layout="total, sizes, prev, pager, next, jumper"
-                   :total="total"
-                   :page-sizes="[5, 10]"
-                   :page-size="pageSize"
-                   v-show="total>5"
-                   @size-change="handleSizeChange"
-                   @current-change="handleCurrentChange"
-                   background style="margin-top:10px">
-    </el-pagination>
+
+<!--    <template>-->
+<!--      <el-table :data="swaggerData" stripe style="width: 100%">-->
+<!--        <el-table-column label="ID" prop="id"></el-table-column>-->
+<!--        <el-table-column label="Server URL" prop="serverUrl"></el-table-column>-->
+<!--        <el-table-column label="API URL" prop="apiUrl"></el-table-column>-->
+<!--        <el-table-column label="Method" prop="method"></el-table-column>-->
+<!--        &lt;!&ndash; 其他列... &ndash;&gt;-->
+<!--      </el-table>-->
+<!--    </template>-->
+
 
   </el-card>
-
+  <el-card>
+    <el-pagination
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
+    :current-page="currentPage"
+    :page-sizes="[10, 20, 50]"
+    :page-size="pageSize"
+    layout="total, sizes, prev, pager, next, jumper"
+    :total="total">
+  </el-pagination></el-card>
 </template>
 <script>
 
@@ -73,50 +83,52 @@ import {Codemirror} from 'vue-codemirror';
 import {json} from '@codemirror/lang-json';
 import {oneDark} from '@codemirror/theme-one-dark';
 import {ref, shallowRef} from 'vue';
+import axios from "axios";
 export default {
 
   data() {
     return {
-      code1: '11111111',
+      // code1: '11111111',
       paraForm: {
         url: '1111',
       },
       tableData: [],
-      currentPage: {
-        pageNo: 1,
-        pageSize: 5,
-        totalCount: 0
-      },
-
       swaggerData: [],
       apiForm: {},
       apiFormRules: [],
+      records: [],
+      tempData:[],
+      currentPage: 1, // 当前页码
+      pageSize: 10, // 每页显示记录数
+      total: 0, // 总记录数
     };
   },
   mounted() {
-    this.sent();
+    // this.sent();
+    // debugger;
+    this.fetchData();
   },
   components: {
     Codemirror,
   },
   setup() {
-    const code = ref(`console.log('Hello, world!')`);
+    const code = ref('console.log(\'Hello, world!\')');
     const extensions = [json(), oneDark];
     const view = shallowRef();
     const handleReady = (payload) => {
       view.value = payload.view;
     };
-    const getCodemirrorStates = () => {
-      const state = view.value.state;
-      const ranges = state.selection.ranges;
-      const selected = ranges.reduce(
-        (r, range) => r + range.to - range.from,
-        0
-      );
-      const cursor = ranges[0].anchor;
-      const length = state.doc.length;
-      const lines = state.doc.lines;
-    };
+    // const getCodemirrorStates = () => {
+    //   const state = view.value.state;
+    //   const ranges = state.selection.ranges;
+    //   const selected = ranges.reduce(
+    //     (r, range) => r + range.to - range.from,
+    //     0
+    //   );
+    //   const cursor = ranges[0].anchor;
+    //   const length = state.doc.length;
+    //   const lines = state.doc.lines;
+    // };
     const formatJson = (data) => {
       data.outputParam = JSON.stringify(
         JSON.parse(data.outputParam),
@@ -129,7 +141,7 @@ export default {
       extensions,
       handleReady,
       log: console.log,
-      formatJson,
+      formatJson
     };
   },
   methods: {
@@ -137,7 +149,7 @@ export default {
       const {data: res} = await this.$http.post('/swagger/query', this.paraForm);
       console.log(res);
       if (res.code !== 200) return this.$message.error(res.msg);
-      for (var i = 0; i < res.data.length; i++) {
+      for (let i = 0; i < res.data.length; i++) {
         res.data[i].inputParam = JSON.stringify(
           JSON.parse(res.data[i].inputParam),
           null,
@@ -188,6 +200,30 @@ export default {
       } else {
         console.error('Invalid HTTP method:', method);
       }
+    },
+    fetchData() {
+      axios.get('/swagger/selectByPage', {
+        params: {
+          current: this.currentPage,
+          size: this.pageSize,
+        },
+      })
+        .then(response => {
+          this.total = response.data.total;
+          console.log(response.data.records)
+          this.swaggerData = [...response.data.records]
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.fetchData();
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.fetchData();
     },
   },
 };
