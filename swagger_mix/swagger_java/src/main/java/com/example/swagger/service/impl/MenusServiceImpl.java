@@ -1,9 +1,6 @@
 package com.example.swagger.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.swagger.entity.Menus;
-import com.example.swagger.service.MenusService;
-import com.example.swagger.mapper.MenusMapper;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
