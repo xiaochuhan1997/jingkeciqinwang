@@ -7,7 +7,6 @@
   </el-breadcrumb>
   <el-card>
     <el-form :model="paraForm" ref="paraFormRef" label-width="150px" :inline="true">
-      <!-- url -->
       <el-form-item style='width: 60%' label="swagger API 地址">
         <el-input v-model="paraForm.url" placeholder="请输入API 地址(http(s)://)">d
           <template #append>
@@ -52,7 +51,6 @@
             </el-form>
           </div>
         </template>
-
       </el-table-column>
       <el-table-column label="接口地址" prop="apiUrl" width="400px"/>
       <el-table-column label="请求方式" prop="method"/>
@@ -67,11 +65,7 @@ import { json } from '@codemirror/lang-json';
 import { oneDark } from '@codemirror/theme-one-dark';
 import {ref, shallowRef} from 'vue';
 export default {
-  // components: {
-  //   Codemirror,
-  // },
   mounted() {
-    // debugger;
   },
   data() {
     return {
@@ -87,15 +81,12 @@ export default {
       apiFormRules: []
     };
   },
-
   components: {
     Codemirror,
   },
   setup() {
     const code = ref(`console.log('Hello, world!')`);
     const extensions = [json(), oneDark];
-
-    // Codemirror EditorView instance ref
     const view = shallowRef();
     const handleReady = (payload) => {
       view.value = payload.view;

@@ -5,7 +5,6 @@
     <el-breadcrumb-item>控制台</el-breadcrumb-item>
     <el-breadcrumb-item>接口管理</el-breadcrumb-item>
   </el-breadcrumb>
-
   <el-card>
     <el-table :data="swaggerData" :style="{ width: '100%'}" :row-key="(row)=>{return row.id;}">
       <el-table-column type="expand">
@@ -16,8 +15,7 @@
               <el-row>
                 <el-col>
               <el-form-item>
-<!--                <el-button type="" @click="save(props.row.serverUrl,props.row.apiUrl,props.row.method,props.row.tag,props.row.summary,props.row.inputParam,props.row.outputParam,)">保存案例</el-button>-->
-                <el-button @click="sendJson(props.row.id,props.row.method,props.row.inputParam,props.row.outputParam,props.row.apiUrl,props.row.serverUrl,props.row.inputParamDec)">发送JSON请求</el-button>
+                <el-button @click="sendJson(props.row)">发送JSON请求</el-button>
               </el-form-item>
                 </el-col>
               </el-row>
@@ -53,18 +51,6 @@
       <el-table-column label="接口描述" prop="summary"/>
       <el-table-column label="接口所属分组" prop="tag"/>
     </el-table>
-
-<!--    <template>-->
-<!--      <el-table :data="swaggerData" stripe style="width: 100%">-->
-<!--        <el-table-column label="ID" prop="id"></el-table-column>-->
-<!--        <el-table-column label="Server URL" prop="serverUrl"></el-table-column>-->
-<!--        <el-table-column label="API URL" prop="apiUrl"></el-table-column>-->
-<!--        <el-table-column label="Method" prop="method"></el-table-column>-->
-<!--        &lt;!&ndash; 其他列... &ndash;&gt;-->
-<!--      </el-table>-->
-<!--    </template>-->
-
-
   </el-card>
   <el-card>
     <el-pagination
@@ -75,17 +61,16 @@
     :page-size="pageSize"
     layout="total, sizes, prev, pager, next, jumper"
     :total="total">
-  </el-pagination></el-card>
+  </el-pagination>
+  </el-card>
 </template>
 <script>
-
 import {Codemirror} from 'vue-codemirror';
 import {json} from '@codemirror/lang-json';
 import {oneDark} from '@codemirror/theme-one-dark';
 import {ref, shallowRef} from 'vue';
 import axios from "axios";
 export default {
-
   data() {
     return {
       // code1: '11111111',
@@ -104,8 +89,6 @@ export default {
     };
   },
   mounted() {
-    // this.sent();
-    // debugger;
     this.fetchData();
   },
   components: {
@@ -118,17 +101,6 @@ export default {
     const handleReady = (payload) => {
       view.value = payload.view;
     };
-    // const getCodemirrorStates = () => {
-    //   const state = view.value.state;
-    //   const ranges = state.selection.ranges;
-    //   const selected = ranges.reduce(
-    //     (r, range) => r + range.to - range.from,
-    //     0
-    //   );
-    //   const cursor = ranges[0].anchor;
-    //   const length = state.doc.length;
-    //   const lines = state.doc.lines;
-    // };
     const formatJson = (data) => {
       data.outputParam = JSON.stringify(
         JSON.parse(data.outputParam),
@@ -164,20 +136,17 @@ export default {
       this.swaggerData = res.data;
       console.log(this.swaggerData);
     },
-    sendJson(id,method,inputParam,outputParam,apiUrl,serverUrl,inputParamDec) {
-      // 利用传递的ID进行处理，比如构建请求数据
+    sendJson(data) {
       const requestData = {
-        id: id,
-        methods: method,
-        inputParam: inputParam,
-        inputParamDec: inputParamDec,
-        outputParam: outputParam,
-        apiUrl: apiUrl,
-        serverUrl: serverUrl
-        // 根据你的需求构建其他请求数据
+        id: data.id,
+        methods: data.method,
+        inputParam: data.inputParam,
+        inputParamDec: data.inputParamDec,
+        outputParam: data.outputParam,
+        apiUrl: data.apiUrl,
+        serverUrl: data.serverUrl
       };
-      console.log(id,method,apiUrl,inputParamDec)
-      if (method === 'get') {
+      if (data.method === 'get') {
         this.$http.get('/api/getAll', { params: requestData })
           .then(response => {
             // 处理成功回调
@@ -187,7 +156,7 @@ export default {
             // 处理错误回调
             console.error(error);
           });
-      } else if (method === 'post') {
+      } else if (data.method === 'post') {
         this.$http.post('/api/sendPostRequest', requestData)
           .then(response => {
             // 处理成功回调
@@ -198,7 +167,7 @@ export default {
             console.error(error);
           });
       } else {
-        console.error('Invalid HTTP method:', method);
+        console.error('Invalid HTTP method:', data.method);
       }
     },
     fetchData() {

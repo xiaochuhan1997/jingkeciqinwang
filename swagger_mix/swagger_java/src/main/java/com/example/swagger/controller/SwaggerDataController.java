@@ -27,7 +27,6 @@ public class SwaggerDataController {
         List<SwaggerData> dataList = swaggerDataService.analyze();
         return R.success(dataList);
     }
-
     //swagger查询
     @PostMapping("/query")
     public R<List<SwaggerData>> query(@RequestBody Object a) {
@@ -35,36 +34,21 @@ public class SwaggerDataController {
         List<SwaggerData> dataList = swaggerDataService.list();
         return R.success(dataList);
     }
-
     @GetMapping
     private String list() {
         return "get ok";
     }
-
     //保存案例
     @PostMapping("/saveData")
     public SwaggerData saveData(@RequestBody Map<String, Object> requestData) {
-        SwaggerData swaggerdata = new SwaggerData();
-        swaggerdata.setMethod(String.valueOf(requestData.get("method")));
-        swaggerdata.setInputParam(String.valueOf(requestData.get("inputParam")));
-        swaggerdata.setOutputParam(String.valueOf(requestData.get("outputParam")));
-        swaggerdata.setApiUrl(String.valueOf(requestData.get("apiUrl")));
-        swaggerdata.setServerUrl(String.valueOf(requestData.get("serverUrl")));
-        swaggerdata.setTag(String.valueOf(requestData.get("tag")));
-        swaggerdata.setSummary(String.valueOf(requestData.get("summary")));
-        swaggerdata.setCaseNo(String.valueOf(requestData.get("caseNo")));
-        swaggerdata.setCaseDec(String.valueOf(requestData.get("caseDec")));
-        swaggerdata.setOutputParamDec(String.valueOf(requestData.get("outputParamDec")));
-        swaggerdata.setInputParamDec(String.valueOf(requestData.get("inputParamDec")));
-        return swaggerDataService.saveData(swaggerdata);
+        log.info("开始保存数据:{}");
+        return swaggerDataService.saveData(requestData);
     }
-
     @GetMapping("/selectByPage")
     public IPage<SwaggerData> getSwaggerDataPage(@RequestParam(defaultValue = "1") int current,
                                                  @RequestParam(defaultValue = "10") int size) {
         // 调用 Service 中的分页查询方法
-        IPage<SwaggerData> pageResult = swaggerDataService.selectSwaggerDataPage(current, size);
-
-        return pageResult;
+//        IPage<SwaggerData> pageResult = swaggerDataService.selectSwaggerDataPage(current, size);
+        return swaggerDataService.selectSwaggerDataPage(current, size);
     }
 }

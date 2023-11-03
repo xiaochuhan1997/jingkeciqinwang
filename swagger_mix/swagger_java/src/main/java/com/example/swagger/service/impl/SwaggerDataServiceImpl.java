@@ -11,12 +11,14 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 //import org.apache.commons.lang3.SerializationUtils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, SwaggerData> implements SwaggerDataService {
@@ -195,7 +197,7 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                         ((JSONObject) object).put("$ref", jsonObjectTmp);
 
                     }
-                    analysisJson((JSONObject) object);
+                    analysisJson(object);
 
                 }
                 //如果key中是其他
@@ -213,12 +215,25 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
     public SwaggerData getInputOutputParamsById(Long id) {
         return swaggerDataMapper.findInputOutputParamsById(id);
     }
+
     @Override
-    public SwaggerData saveData(SwaggerData swaggerData) {
-        int rowsInserted = swaggerDataMapper.saveData(swaggerData);
+    public SwaggerData saveData(@RequestBody Map<String, Object> requestData) {
+        SwaggerData swaggerdata = new SwaggerData();
+        swaggerdata.setMethod(String.valueOf(requestData.get("method")));
+        swaggerdata.setInputParam(String.valueOf(requestData.get("inputParam")));
+        swaggerdata.setOutputParam(String.valueOf(requestData.get("outputParam")));
+        swaggerdata.setApiUrl(String.valueOf(requestData.get("apiUrl")));
+        swaggerdata.setServerUrl(String.valueOf(requestData.get("serverUrl")));
+        swaggerdata.setTag(String.valueOf(requestData.get("tag")));
+        swaggerdata.setSummary(String.valueOf(requestData.get("summary")));
+        swaggerdata.setCaseNo(String.valueOf(requestData.get("caseNo")));
+        swaggerdata.setCaseDec(String.valueOf(requestData.get("caseDec")));
+        swaggerdata.setOutputParamDec(String.valueOf(requestData.get("outputParamDec")));
+        swaggerdata.setInputParamDec(String.valueOf(requestData.get("inputParamDec")));
+        int rowsInserted = swaggerDataMapper.saveData(swaggerdata);
         if (rowsInserted > 0) {
             // Insertion was successful
-            return swaggerData;
+            return swaggerdata;
         } else {
             // Handle insertion failure
             return null; // You can return an error response or throw an exception
@@ -231,9 +246,9 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
         Page<SwaggerData> page = new Page<>(current, size);
 
         // 调用 MyBatis-Plus 的分页查询方法
-        IPage<SwaggerData> pageResult = swaggerDataMapper.selectPage(page, null);
+//        IPage<SwaggerData> pageResult = swaggerDataMapper.selectPage(page, null);
 
-        return pageResult;
+        return swaggerDataMapper.selectPage(page, null);
     }
 
 
