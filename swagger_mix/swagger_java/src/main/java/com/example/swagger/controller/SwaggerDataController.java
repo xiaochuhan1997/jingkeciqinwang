@@ -6,6 +6,8 @@ import com.example.swagger.entity.SwaggerData;
 import com.example.swagger.service.SwaggerDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,5 +52,14 @@ public class SwaggerDataController {
         // 调用 Service 中的分页查询方法
 //        IPage<SwaggerData> pageResult = swaggerDataService.selectSwaggerDataPage(current, size);
         return swaggerDataService.selectSwaggerDataPage(current, size);
+    }
+    @DeleteMapping("/deleteRecord/{id}")
+    public ResponseEntity<String> deleteRecord(@PathVariable Long id) {
+        boolean result = swaggerDataService.removeById(id);
+        if (result) {
+            return ResponseEntity.ok("记录删除成功");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("记录删除失败");
+        }
     }
 }

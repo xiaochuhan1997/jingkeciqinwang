@@ -1,5 +1,4 @@
 <template>
-  <!-- 面包导航区 -->
   <el-breadcrumb separator-icon="ArrowRight">
     <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
     <el-breadcrumb-item>控制台</el-breadcrumb-item>
@@ -27,14 +26,14 @@
           <div m="4">
             <el-form :inline="true" ref="apiFormRef" :model="apiForm" :rules="apiFormRules"
                      label-width="120px" status-icon :style="{ marginLeft: '20px'}">
-              <el-form-item label="案例号" prop="caseNo">
-                <el-input v-model="formData.caseNo" maxlength="30"/>
+              <el-form-item label="案例号" prop="caseNo" >
+                <el-input v-model="formData.caseNo" maxlength="50" style="width: 400px" />
               </el-form-item>
               <el-form-item label="案例描述" prop="caseDec">
-                <el-input v-model="formData.caseDec" maxlength="100"/>
+                <el-input v-model="formData.caseDec" maxlength="100" style="width: 400px"/>
               </el-form-item>
               <el-form-item>
-                <el-button type="" @click="saveData(props.row)">保存案例</el-button>
+                <el-button type="primary" @click="showSaveConfirm(props.row)">保存案例</el-button>
               </el-form-item>
               <el-form-item>
                 <codemirror v-model=props.row.inputParam placeholder="Code goes here..."
@@ -141,9 +140,29 @@ export default {
         );
       }
       this.swaggerData = res.data;
+    },showSaveConfirm(data) {
+      // 校验输入框
+      if (!this.formData.caseNo) {
+        this.$message.error('案例号不能为空');
+        return;
+      }
+
+      if (!this.formData.caseDec) {
+        this.$message.error('案例描述不能为空');
+        return;
+      }
+      this.$confirm('确定要保存此案例吗?', '确认', {
+        cancelButtonText: '取消',
+        confirmButtonText: '保存',
+        type: 'warning',
+      })
+        .then(() => {
+          this.saveData(data);
+        })
+        .catch(() => {
+        });
     },
     saveData(data) {
-      // 利用传递的ID进行处理，比如构建请求数据
       const requestData = {
         method: data.method,
         inputParam: data.inputParam,
@@ -156,18 +175,8 @@ export default {
         outputParamDec: data.outputParamDec,
         caseNo: this.formData.caseNo,
         caseDec: this.formData.caseDec
-        // 根据你的需求构建其他请求数据
       };
-      console.log(data.summary,data.inputParamDec)
-      if (!this.formData.caseNo) {
-        this.$message.error('案例号不能为空');
-        return; // 阻止继续执行
-      }
-      // 判断caseDec是否为空
-      if (!this.formData.caseDec) {
-        this.$message.error('案例描述不能为空');
-        return; // 阻止继续执行
-      }
+
       this.$http.post('/swagger/saveData', requestData)
         .then(response => {
           // 处理成功回调
@@ -179,7 +188,7 @@ export default {
           console.error(error);
           this.$message.error('保存异常，请检查错误日志');
         });
-    }
+    },
   },
 };
 </script>

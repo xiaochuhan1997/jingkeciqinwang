@@ -1,5 +1,4 @@
 <template>
-  <!--   面包导航区-->
   <el-breadcrumb separator-icon="ArrowRight">
     <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
     <el-breadcrumb-item>控制台</el-breadcrumb-item>
@@ -15,7 +14,8 @@
               <el-row>
                 <el-col>
               <el-form-item>
-                <el-button @click="sendJson(props.row)">发送JSON请求</el-button>
+                <el-button type="primary" @click="sendJson(props.row)">发送JSON请求</el-button>
+                <el-button type="danger" @click="confirmDelete(props.row.id)">删除案例</el-button>
               </el-form-item>
                 </el-col>
               </el-row>
@@ -43,9 +43,9 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="案例号" prop="caseNo"/>
+      <el-table-column label="案例号" prop="caseNo" width="200px"/>
       <el-table-column label="案例描述" prop="caseDec"/>
-      <el-table-column label="接口地址" prop="serverUrl"/>
+      <el-table-column label="请求地址" prop="serverUrl"/>
       <el-table-column label="接口地址" prop="apiUrl"/>
       <el-table-column label="请求方式" prop="method"/>
       <el-table-column label="接口描述" prop="summary"/>
@@ -193,7 +193,32 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val;
       this.fetchData();
+    }, confirmDelete(id) {
+      this.$confirm('是否确认删除此案例?', '确认删除', {
+        confirmButtonText: '是',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        // 用户点击 '是'，执行删除操作
+        console.log(1)
+        this.deleteCase(id);
+      }).catch(() => {
+        // 用户点击 '取消'，不执行任何操作
+      });
     },
+    deleteCase(id) {
+      this.$http.delete(`/swagger/deleteRecord/${id}`)
+        .then(response => {
+          this.$message.success('案例删除成功');
+          this.fetchData();
+        })
+        .catch(error => {
+          console.log("要删除的ID为"+id)
+          // 处理错误响应
+          this.$message.error('删除案例时出现错误');
+          console.error(error);
+        });
+    }
   },
 };
 </script>
