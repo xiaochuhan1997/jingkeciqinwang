@@ -1,4 +1,5 @@
 package com.example.swagger.service.impl;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.SerializationUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 //import org.apache.commons.lang3.SerializationUtils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, SwaggerData> implements SwaggerDataService {
@@ -219,6 +221,8 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
     @Override
     public SwaggerData saveData(@RequestBody Map<String, Object> requestData) {
         SwaggerData swaggerdata = new SwaggerData();
+        LocalDateTime now = LocalDateTime.now();
+        swaggerdata.setCreateTime(now);
         swaggerdata.setMethod(String.valueOf(requestData.get("method")));
         swaggerdata.setInputParam(String.valueOf(requestData.get("inputParam")));
         swaggerdata.setOutputParam(String.valueOf(requestData.get("outputParam")));
@@ -244,11 +248,12 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
     public IPage<SwaggerData> selectSwaggerDataPage(int current, int size) {
         // 创建一个 Page 对象，用于分页查询
         Page<SwaggerData> page = new Page<>(current, size);
-
+        QueryWrapper<SwaggerData> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("create_time"); // 降序排序，如果需要升序排序，可以使用 orderByAsc
         // 调用 MyBatis-Plus 的分页查询方法
 //        IPage<SwaggerData> pageResult = swaggerDataMapper.selectPage(page, null);
 
-        return swaggerDataMapper.selectPage(page, null);
+        return swaggerDataMapper.selectPage(page, queryWrapper);
     }
 
 

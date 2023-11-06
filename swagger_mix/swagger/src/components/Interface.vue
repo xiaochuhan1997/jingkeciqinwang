@@ -6,7 +6,7 @@
   </el-breadcrumb>
   <el-card>
     <el-table :data="swaggerData" :style="{ width: '100%'}" :row-key="(row)=>{return row.id;}">
-      <el-table-column type="expand">
+      <el-table-column type="expand" >
         <template #default="props">
           <div m="4">
             <el-form :inline="true" ref="apiFormRef" :model="apiForm" :rules="apiFormRules"
@@ -43,13 +43,14 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="案例号" prop="caseNo" width="200px"/>
-      <el-table-column label="案例描述" prop="caseDec"/>
+      <el-table-column label="案例号" prop="caseNo" width="360px"/>
+      <el-table-column label="案例描述" prop="caseDec" width="400px"/>
       <el-table-column label="请求地址" prop="serverUrl"/>
       <el-table-column label="接口地址" prop="apiUrl"/>
-      <el-table-column label="请求方式" prop="method"/>
+      <el-table-column label="请求方式" prop="method" width="80px"/>
       <el-table-column label="接口描述" prop="summary"/>
       <el-table-column label="接口所属分组" prop="tag"/>
+
     </el-table>
   </el-card>
   <el-card>
@@ -77,6 +78,7 @@ export default {
       paraForm: {
         url: '1111',
       },
+      isExpandVisible: true,
       tableData: [],
       swaggerData: [],
       apiForm: {},

@@ -20,17 +20,17 @@
     </el-form>
   </el-card>
   <el-card>
-    <el-table :data="swaggerData" :style="{ width: '100%'}" :row-key="(row)=>{return row.id;}">
-      <el-table-column type="expand">
+    <el-table :data="swaggerData" :style="{ width: '100%'}" :row-key="(row)=>{return row.id;}" :highlight-current-row="true" >
+      <el-table-column type="expand" >
         <template #default="props">
           <div m="4">
-            <el-form :inline="true" ref="apiFormRef" :model="apiForm" :rules="apiFormRules"
+            <el-form :inline="true" ref="apiFormRef" :model="props.row" :rules="apiFormRules"
                      label-width="120px" status-icon :style="{ marginLeft: '20px'}">
               <el-form-item label="案例号" prop="caseNo" >
-                <el-input v-model="formData.caseNo" maxlength="50" style="width: 400px" />
+                <el-input v-model="props.row.caseNo" maxlength="50" style="width: 400px" />
               </el-form-item>
               <el-form-item label="案例描述" prop="caseDec">
-                <el-input v-model="formData.caseDec" maxlength="100" style="width: 400px"/>
+                <el-input v-model="props.row.caseDec" maxlength="100" style="width: 400px"/>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="showSaveConfirm(props.row)">保存案例</el-button>
@@ -63,12 +63,14 @@ import { Codemirror } from 'vue-codemirror';
 import { json } from '@codemirror/lang-json';
 import { oneDark } from '@codemirror/theme-one-dark';
 import {ref, shallowRef} from 'vue';
+import {handleCurrentChange} from "element-plus/es/components/tree/src/model/util";
 export default {
   mounted() {
   },
   data() {
     return {
       code1: '11111111',
+      isExpandVisible: true,
       paraForm: {
         url: '',
       },formData: {
@@ -77,14 +79,15 @@ export default {
       },
       swaggerData: [],
       apiForm: {},
-      apiFormRules: []
+      apiFormRules: [],
+      expandedRows: []
     };
   },
   components: {
     Codemirror,
   },
   setup() {
-    const code = ref(`console.log('Hello, world!')`);
+    const code = ref('console.log(\'Hello, world!\')');
     const extensions = [json(), oneDark];
     const view = shallowRef();
     const handleReady = (payload) => {
@@ -117,12 +120,14 @@ export default {
     };
   },
   methods: {
-    async sent() {
+    handleCurrentChange (row) {
+      console.log(row)
+    }, async sent() {
       const { data: res } = await this.$http.post('/swagger/analyze', this.paraForm);
       console.log(res);
       if (res.code !== 200) return this.$message.error(res.msg);
       this.$message.success('解析成功');
-      for (var i = 0; i < res.data.length; i++) {
+      for (let i = 0; i < res.data.length; i++) {
         res.data[i].inputParam = JSON.stringify(
           JSON.parse(res.data[i].inputParam),
           null,
@@ -140,14 +145,15 @@ export default {
         );
       }
       this.swaggerData = res.data;
-    },showSaveConfirm(data) {
+    },
+    showSaveConfirm(data) {
       // 校验输入框
-      if (!this.formData.caseNo) {
+      if (!data.caseNo) {
         this.$message.error('案例号不能为空');
         return;
       }
 
-      if (!this.formData.caseDec) {
+      if (!data.caseDec) {
         this.$message.error('案例描述不能为空');
         return;
       }
@@ -160,9 +166,12 @@ export default {
           this.saveData(data);
         })
         .catch(() => {
-        });
-    },
-    saveData(data) {
+        }).finally(
+        () => {
+          data.collapsed = !data.collapsed;
+        }
+      );
+    }, saveData(data) {
       const requestData = {
         method: data.method,
         inputParam: data.inputParam,
@@ -173,21 +182,29 @@ export default {
         tag: data.tag,
         summary: data.summary,
         outputParamDec: data.outputParamDec,
-        caseNo: this.formData.caseNo,
-        caseDec: this.formData.caseDec
+        caseNo: data.caseNo,
+        caseDec: data.caseDec
       };
-
       this.$http.post('/swagger/saveData', requestData)
         .then(response => {
           // 处理成功回调
           console.log(response);
           this.$message.success('保存成功');
+          data.caseNo = '';
+          data.caseDec = '';
         })
         .catch(error => {
           // 处理错误回调
           console.error(error);
           this.$message.error('保存异常，请检查错误日志');
         });
+    }, handleRowClick(row) {
+      const index = this.expandedRows.indexOf(row);
+      if (index === -1) {
+        this.expandedRows.push(row); // 展开行
+      } else {
+        this.expandedRows.splice(index, 1); // 折叠行
+      }
     },
   },
 };
