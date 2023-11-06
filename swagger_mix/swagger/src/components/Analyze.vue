@@ -20,7 +20,13 @@
     </el-form>
   </el-card>
   <el-card>
-    <el-table :data="swaggerData" :style="{ width: '100%'}" :row-key="(row)=>{return row.id;}" :highlight-current-row="true" >
+    <el-table
+      :data="swaggerData"
+      :style="{ width: '100%'}"
+      :row-key="(row)=>{return row.id;}"
+      :highlight-current-row="true"
+      :expand-row-keys="expandedRows"
+    >
       <el-table-column type="expand" >
         <template #default="props">
           <div m="4">
@@ -164,13 +170,12 @@ export default {
       })
         .then(() => {
           this.saveData(data);
+          console.log(data.id)
+          // alert(data.id)
+          this.expandedRows = []
         })
         .catch(() => {
-        }).finally(
-        () => {
-          data.collapsed = !data.collapsed;
-        }
-      );
+        });
     }, saveData(data) {
       const requestData = {
         method: data.method,
