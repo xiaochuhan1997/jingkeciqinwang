@@ -21,11 +21,11 @@
   </el-card>
   <el-card>
     <el-table
+      ref="swaggerTable"
       :data="swaggerData"
       :style="{ width: '100%'}"
       :row-key="(row)=>{return row.id;}"
       :highlight-current-row="true"
-      :expand-row-keys="expandedRows"
     >
       <el-table-column type="expand" >
         <template #default="props">
@@ -170,9 +170,7 @@ export default {
       })
         .then(() => {
           this.saveData(data);
-          console.log(data.id)
-          // alert(data.id)
-          this.expandedRows = []
+          this.$refs.swaggerTable.toggleRowExpansion(data);
         })
         .catch(() => {
         });
