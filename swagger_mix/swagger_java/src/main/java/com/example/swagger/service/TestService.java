@@ -1,7 +1,10 @@
 package com.example.swagger.service;
+import com.example.swagger.entity.SwaggerData;
+import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.example.swagger.entity.Test;
+import java.util.List;
 
-public interface TestService extends IService<Test> {
+@Service
+public interface TestService {
+    List<SwaggerData> findByCaseNoAndCaseDec(String caseNo, String caseDec);
 }

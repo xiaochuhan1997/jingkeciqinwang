@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 import java.io.*;
@@ -46,8 +47,6 @@ public class ApiController {
     @ApiOperation("发送Post请求")
     @PostMapping("/sendPostRequest")
     public ResponseEntity<String> sendPostRequest(@RequestBody Map<String, Object> request) {
-//        Long id = Long.valueOf(String.valueOf(request.get("id")));
-//      SwaggerData result = swaggerDataService.getInputOutputParamsById(id);
         String method = String.valueOf(request.get("methods"));
         //测试用json/url
         String json = String.valueOf(request.get("inputParam"));
@@ -60,6 +59,17 @@ public class ApiController {
         } else {
             return ResponseEntity.badRequest().body("Invalid method");
         }
+    }
+    @ApiOperation("发送Get请求")
+    @GetMapping("/sendGetRequest")
+    public ResponseEntity<String> sendGetRequest(@RequestBody Map<String, Object> request) {
+        String url = String.valueOf(request.get("serverUrl"))+ request.get("apiUrl");
+        Map<String, Object> inputParam = (Map<String, Object>) request.get("inputParam");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
+        for (Map.Entry<String, Object> entry : inputParam.entrySet()) {
+            builder.queryParam(entry.getKey(), entry.getValue());
+        }
+        return restTemplate.getForEntity(url, String.class);
     }
     @GetMapping("/getAll")
     public List<SwaggerData> getAllSwaggerData() {

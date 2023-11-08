@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
+
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +55,8 @@ public class SwaggerDataController {
 //        IPage<SwaggerData> pageResult = swaggerDataService.selectSwaggerDataPage(current, size);
         return swaggerDataService.selectSwaggerDataPage(current, size);
     }
-    @DeleteMapping("/deleteRecord/{id}")
+    @ApiIgnore
+    @DeleteMapping("/deleteRecordforce/{id}")
     public ResponseEntity<String> deleteRecord(@PathVariable Long id) {
         boolean result = swaggerDataService.removeById(id);
         if (result) {

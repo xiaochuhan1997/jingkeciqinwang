@@ -5,16 +5,33 @@
     <el-breadcrumb-item>接口管理</el-breadcrumb-item>
   </el-breadcrumb>
   <el-card>
-    <el-table :data="swaggerData" :style="{ width: '100%'}" :row-key="(row)=>{return row.id;}">
+    <el-table
+      :data="swaggerData"
+      :style="{ width: '100%'}"
+      :row-key="(row)=>{return row.id;}">
       <el-table-column type="expand" >
         <template #default="props">
           <div m="4">
-            <el-form :inline="true" ref="apiFormRef" :model="apiForm" :rules="apiFormRules"
-                     label-width="120px" status-icon :style="{ marginLeft: '20px'}">
+            <el-form
+              :inline="true"
+              ref="apiFormRef"
+              :model="apiForm"
+              :rules="apiFormRules"
+              label-width="120px"
+              status-icon
+              :style="{ marginLeft: '20px'}"
+            >
               <el-row>
                 <el-col>
               <el-form-item>
-                <el-button type="primary" @click="sendJson(props.row)">发送JSON请求</el-button>
+                <el-tooltip
+                  class="box-item"
+                  effect="dark"
+                  content="Right Top prompts info"
+                  placement="right-start"
+                >
+                  <el-button type="primary" @click="sendJson(props.row)">发送JSON请求</el-button>
+                </el-tooltip>
                 <el-button type="danger" @click="confirmDelete(props.row.id)">删除案例</el-button>
               </el-form-item>
                 </el-col>
@@ -22,21 +39,49 @@
               <el-row>
                 <el-col>
               <el-form-item>
-                <codemirror v-model=props.row.inputParam placeholder="Code goes here..."
-                            :style="{ height: '300px',width: '1300px'}" :autofocus="true"
-                            :indent-with-tab="true" :tab-size="2" :extensions="extensions"
-                            @ready="handleReady" @blur="formatJson(props.row)"/>
+                <codemirror
+                  v-model=props.row.inputParam
+                  placeholder="Code goes here..."
+                  :style="{ height: '300px',width: '1300px'}"
+                  :autofocus="true"
+                  :indent-with-tab="true"
+                  :tab-size="2"
+                  :extensions="extensions"
+                  @ready="handleReady"
+                  @blur="formatJson(props.row)"/>
               </el-form-item>
                 </el-col>
               </el-row>
               <el-row>
                 <el-col>
               <el-form-item>
-                <codemirror v-model=props.row.outputParam placeholder="Code goes here..."
-                            :style="{ height: '300px',width: '1300px'}" :autofocus="true"
-                            :indent-with-tab="true" :tab-size="2" :extensions="extensions"
-                            @ready="handleReady" @blur="formatJson(props.row)"/>
+                <codemirror
+                  v-model=props.row.outputParam
+                  placeholder="Code goes here..."
+                  :style="{ height: '300px',width: '1300px'}"
+                  :autofocus="true"
+                  :indent-with-tab="true"
+                  :tab-size="2"
+                  :extensions="extensions"
+                  @ready="handleReady"
+                  @blur="formatJson(props.row)"/>
               </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col>
+                  <el-form-item>
+                    <codemirror
+                      v-model="responseDataMap[props.row.id]"
+                      placeholder="Code goes here..."
+                      :style="{ height: '300px',width: '1300px'}"
+                      :autofocus="true"
+                      :indent-with-tab="true"
+                      :tab-size="2"
+                      :extensions="extensions"
+                      @ready="handleReady"
+                      @blur="formatJson(props.row)"/>
+                  </el-form-item>
                 </el-col>
               </el-row>
             </el-form>
@@ -50,7 +95,6 @@
       <el-table-column label="请求方式" prop="method" width="80px"/>
       <el-table-column label="接口描述" prop="summary"/>
       <el-table-column label="接口所属分组" prop="tag"/>
-
     </el-table>
   </el-card>
   <el-card>
@@ -88,6 +132,8 @@ export default {
       currentPage: 1, // 当前页码
       pageSize: 10, // 每页显示记录数
       total: 0, // 总记录数
+      responseData: '',
+      responseDataMap: {}
     };
   },
   mounted() {
@@ -149,10 +195,26 @@ export default {
         serverUrl: data.serverUrl
       };
       if (data.method === 'get') {
-        this.$http.get('/api/getAll', { params: requestData })
+        this.responseDataMap = {};
+        // 将 serverUrl 和 apiUrl 拼接
+        const url = `${requestData.serverUrl}${requestData.apiUrl}`;
+        // 将 inputParam 转换为 JSON 对象
+        const params = JSON.parse(requestData.inputParam);
+        // 发送 GET 请求
+        axios.get(url, { params })
           .then(response => {
-            // 处理成功回调
-            console.log(response);
+            if (Array.isArray(response.data) && response.data.length === 0) {
+              this.$message({
+                message: `发送GET请求到${url}成功，但未返回数据`,
+                type: 'warning'
+              });
+            } else {
+              this.responseDataMap[data.id] = JSON.stringify(response.data, null, 2);
+              this.$message({
+                message: `发送GET请求到${url}成功`,
+                type: 'success'
+              });
+            }
           })
           .catch(error => {
             // 处理错误回调
@@ -168,7 +230,7 @@ export default {
             // 处理错误回调
             console.error(error);
           });
-      } else {
+      }else {
         console.error('Invalid HTTP method:', data.method);
       }
     },
@@ -209,7 +271,7 @@ export default {
       });
     },
     deleteCase(id) {
-      this.$http.delete(`/swagger/deleteRecord/${id}`)
+      this.$http.delete(`/swagger/deleteRecordforce/${id}`)
         .then(response => {
           this.$message.success('案例删除成功');
           this.fetchData();
@@ -220,6 +282,14 @@ export default {
           this.$message.error('删除案例时出现错误');
           console.error(error);
         });
+    },buildURL(template, params) {
+      let url = template;
+      for (let key in params) {
+        if (params.hasOwnProperty(key)) {
+          url = url.replace('{' + key + '}', encodeURIComponent(params[key]));
+        }
+      }
+      return url;
     }
   },
 };
