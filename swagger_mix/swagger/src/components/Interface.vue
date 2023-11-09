@@ -5,7 +5,7 @@
     <el-breadcrumb-item>接口管理</el-breadcrumb-item>
   </el-breadcrumb>
   <el-card>
-    <el-button type="danger" @click="selection(selectedIds)">删除案例</el-button>
+    <el-button type="danger" @click="confirmDelete(selectedIds)">删除案例</el-button>
     <el-table
       :data="swaggerData"
       :style="{ width: '100%'}"
@@ -52,7 +52,8 @@
                       :tab-size="2"
                       :extensions="extensions"
                       @ready="handleReady"
-                      @blur="formatJson(props.row)"/>
+                      @blur="formatJson(props.row)"
+                    />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -68,7 +69,8 @@
                       :tab-size="2"
                       :extensions="extensions"
                       @ready="handleReady"
-                      @blur="formatJson(props.row)"/>
+                      @blur="formatJson(props.row)"
+                    />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -84,7 +86,8 @@
                       :tab-size="2"
                       :extensions="extensions"
                       @ready="handleReady"
-                      @blur="formatJson(props.row)"/>
+                      @blur="formatJson(props.row)"
+                    />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -109,7 +112,8 @@
       :page-sizes="[10, 20, 50]"
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="total">
+      :total="total"
+    >
     </el-pagination>
   </el-card>
 </template>
@@ -122,7 +126,6 @@ import axios from "axios";
 export default {
   data() {
     return {
-      // code1: '11111111',
       paraForm: {
         url: '1111',
       },
@@ -174,7 +177,6 @@ export default {
   methods: {
     async sent() {
       const {data: res} = await this.$http.post('/swagger/query', this.paraForm);
-      console.log(res);
       if (res.code !== 200) return this.$message.error(res.msg);
       for (let i = 0; i < res.data.length; i++) {
         res.data[i].inputParam = JSON.stringify(
@@ -189,7 +191,6 @@ export default {
         );
       }
       this.swaggerData = res.data;
-      console.log(this.swaggerData);
     },
     sendJson(data) {
       const requestData = {
@@ -250,7 +251,6 @@ export default {
       })
         .then(response => {
           this.total = response.data.total;
-          console.log(response.data.records)
           this.swaggerData = [...response.data.records]
         })
         .catch(error => {
@@ -265,26 +265,26 @@ export default {
       this.currentPage = val;
       this.fetchData();
     },
-    confirmDelete(idArray) {
-      this.$confirm('是否确认删除这些案例?', '确认删除', {
+    confirmDelete(selectedIds) {
+      if (selectedIds.length === 0) {
+        // 选择框为空，显示提示消息
+        this.$message.warning('请选择要删除的案例');
+      }
+      else {
+        this.$confirm('是否确认删除这些案例?', '确认删除', {
         confirmButtonText: '是',
         cancelButtonText: '取消',
         type: 'warning',
       }).then(() => {
-        // 用户点击 '是'，执行删除操作
-        idArray.forEach(id => {
-          this.deleteCase(id);
-        });
+          this.deleteCase(selectedIds);
       }).catch(() => {
         // 用户点击 '取消'，不执行任何操作
       });
-    },
-    selection(selectedIds) {
-      // 直接将选中行的id数组传递给confirmDelete方法
-      this.confirmDelete(selectedIds);
-    },
-    deleteCase(id) {
-      this.$http.delete(`/swagger/deleteRecordforce/${id}`)
+    }},
+    deleteCase(selectIds) {
+      Promise.all(
+        selectIds.map(id => this.$http.delete(`/swagger/deleteRecordforce/${id}`))
+      )
         .then(response => {
           if (!this.deleteSuccessMessageShown) {
             this.$message.success('案例删除成功');
@@ -293,7 +293,6 @@ export default {
           this.fetchData();
         })
         .catch(error => {
-          console.log("要删除的ID为" + id);
           // 处理错误响应
           this.$message.error('删除案例时出现错误');
           console.error(error);
