@@ -36,7 +36,6 @@
                     >
                       <el-button type="primary" @click="sendJson(props.row)">发送JSON请求</el-button>
                     </el-tooltip>
-                    <el-button type="danger" @click="confirmDelete(props.row.id)">删除案例</el-button>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -286,10 +285,7 @@ export default {
         selectIds.map(id => this.$http.delete(`/swagger/deleteRecordforce/${id}`))
       )
         .then(response => {
-          if (!this.deleteSuccessMessageShown) {
-            this.$message.success('案例删除成功');
-            this.deleteSuccessMessageShown = true;
-          }
+          this.$message.success('案例删除成功');
           this.fetchData();
         })
         .catch(error => {
