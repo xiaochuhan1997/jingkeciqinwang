@@ -5,10 +5,14 @@
     <el-breadcrumb-item>接口管理</el-breadcrumb-item>
   </el-breadcrumb>
   <el-card>
+    <el-button type="danger" @click="selection(selectedIds)">删除案例</el-button>
     <el-table
       :data="swaggerData"
       :style="{ width: '100%'}"
-      :row-key="(row)=>{return row.id;}">
+      :row-key="(row)=>{return row.id;}"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column type="expand" >
         <template #default="props">
           <div m="4">
@@ -23,49 +27,49 @@
             >
               <el-row>
                 <el-col>
-              <el-form-item>
-                <el-tooltip
-                  class="box-item"
-                  effect="dark"
-                  content="Right Top prompts info"
-                  placement="right-start"
-                >
-                  <el-button type="primary" @click="sendJson(props.row)">发送JSON请求</el-button>
-                </el-tooltip>
-                <el-button type="danger" @click="confirmDelete(props.row.id)">删除案例</el-button>
-              </el-form-item>
+                  <el-form-item>
+                    <el-tooltip
+                      class="box-item"
+                      effect="dark"
+                      content="Right Top prompts info"
+                      placement="right-start"
+                    >
+                      <el-button type="primary" @click="sendJson(props.row)">发送JSON请求</el-button>
+                    </el-tooltip>
+                    <el-button type="danger" @click="confirmDelete(props.row.id)">删除案例</el-button>
+                  </el-form-item>
                 </el-col>
               </el-row>
               <el-row>
                 <el-col>
-              <el-form-item>
-                <codemirror
-                  v-model=props.row.inputParam
-                  placeholder="Code goes here..."
-                  :style="{ height: '300px',width: '1300px'}"
-                  :autofocus="true"
-                  :indent-with-tab="true"
-                  :tab-size="2"
-                  :extensions="extensions"
-                  @ready="handleReady"
-                  @blur="formatJson(props.row)"/>
-              </el-form-item>
+                  <el-form-item>
+                    <codemirror
+                      v-model=props.row.inputParam
+                      placeholder="Code goes here..."
+                      :style="{ height: '300px',width: '1300px'}"
+                      :autofocus="true"
+                      :indent-with-tab="true"
+                      :tab-size="2"
+                      :extensions="extensions"
+                      @ready="handleReady"
+                      @blur="formatJson(props.row)"/>
+                  </el-form-item>
                 </el-col>
               </el-row>
               <el-row>
                 <el-col>
-              <el-form-item>
-                <codemirror
-                  v-model=props.row.outputParam
-                  placeholder="Code goes here..."
-                  :style="{ height: '300px',width: '1300px'}"
-                  :autofocus="true"
-                  :indent-with-tab="true"
-                  :tab-size="2"
-                  :extensions="extensions"
-                  @ready="handleReady"
-                  @blur="formatJson(props.row)"/>
-              </el-form-item>
+                  <el-form-item>
+                    <codemirror
+                      v-model=props.row.outputParam
+                      placeholder="Code goes here..."
+                      :style="{ height: '300px',width: '1300px'}"
+                      :autofocus="true"
+                      :indent-with-tab="true"
+                      :tab-size="2"
+                      :extensions="extensions"
+                      @ready="handleReady"
+                      @blur="formatJson(props.row)"/>
+                  </el-form-item>
                 </el-col>
               </el-row>
               <el-row>
@@ -99,14 +103,14 @@
   </el-card>
   <el-card>
     <el-pagination
-    @size-change="handleSizeChange"
-    @current-change="handleCurrentChange"
-    :current-page="currentPage"
-    :page-sizes="[10, 20, 50]"
-    :page-size="pageSize"
-    layout="total, sizes, prev, pager, next, jumper"
-    :total="total">
-  </el-pagination>
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="[10, 20, 50]"
+      :page-size="pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
   </el-card>
 </template>
 <script>
@@ -133,7 +137,10 @@ export default {
       pageSize: 10, // 每页显示记录数
       total: 0, // 总记录数
       responseData: '',
-      responseDataMap: {}
+      responseDataMap: {},
+      selectedRows: [],
+      selectedIds: [],
+      deleteSuccessMessageShown: false
     };
   },
   mounted() {
@@ -257,32 +264,46 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val;
       this.fetchData();
-    }, confirmDelete(id) {
-      this.$confirm('是否确认删除此案例?', '确认删除', {
+    },
+    confirmDelete(idArray) {
+      this.$confirm('是否确认删除这些案例?', '确认删除', {
         confirmButtonText: '是',
         cancelButtonText: '取消',
         type: 'warning',
       }).then(() => {
         // 用户点击 '是'，执行删除操作
-        console.log(1)
-        this.deleteCase(id);
+        idArray.forEach(id => {
+          this.deleteCase(id);
+        });
       }).catch(() => {
         // 用户点击 '取消'，不执行任何操作
       });
     },
+    selection(selectedIds) {
+      // 直接将选中行的id数组传递给confirmDelete方法
+      this.confirmDelete(selectedIds);
+    },
     deleteCase(id) {
       this.$http.delete(`/swagger/deleteRecordforce/${id}`)
         .then(response => {
-          this.$message.success('案例删除成功');
+          if (!this.deleteSuccessMessageShown) {
+            this.$message.success('案例删除成功');
+            this.deleteSuccessMessageShown = true;
+          }
           this.fetchData();
         })
         .catch(error => {
-          console.log("要删除的ID为"+id)
+          console.log("要删除的ID为" + id);
           // 处理错误响应
           this.$message.error('删除案例时出现错误');
           console.error(error);
         });
-    },buildURL(template, params) {
+    },
+    handleSelectionChange(selection) {
+      // 更新选中行的id数组
+      this.selectedIds = selection.map(row => row.id);
+    },
+    buildURL(template, params) {
       let url = template;
       for (let key in params) {
         if (params.hasOwnProperty(key)) {
