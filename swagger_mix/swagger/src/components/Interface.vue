@@ -45,7 +45,7 @@
                     <codemirror
                       v-model=props.row.inputParam
                       placeholder="Code goes here..."
-                      :style="{ height: '300px',width: '1300px'}"
+                      :style="{ minHeight: '300px', maxHeight: '1500px', width: '1300px'}"
                       :autofocus="true"
                       :indent-with-tab="true"
                       :tab-size="2"
@@ -62,7 +62,7 @@
                     <codemirror
                       v-model=props.row.outputParam
                       placeholder="Code goes here..."
-                      :style="{ height: '300px',width: '1300px'}"
+                      :style="{ minHeight: '300px', maxHeight: '1500px', width: '1300px'}"
                       :autofocus="true"
                       :indent-with-tab="true"
                       :tab-size="2"
@@ -79,7 +79,7 @@
                     <codemirror
                       v-model="responseDataMap[props.row.id]"
                       placeholder="Code goes here..."
-                      :style="{ height: '300px',width: '1300px'}"
+                      :style="{ minHeight: '300px', maxHeight: '1500px', width: '1300px'}"
                       :autofocus="true"
                       :indent-with-tab="true"
                       :tab-size="2"
@@ -228,10 +228,24 @@ export default {
             console.error(error);
           });
       } else if (data.method === 'post') {
-        this.$http.post('/api/sendPostRequest', requestData)
+        const url = `${requestData.serverUrl}${requestData.apiUrl}`;
+        // 将 inputParam 转换为 JSON 对象
+        const body = JSON.parse(requestData.inputParam);
+        // 发送 POST 请求
+        axios.post(url, body)
           .then(response => {
-            // 处理成功回调
-            console.log(response);
+            if (Array.isArray(response.data) && response.data.length === 0) {
+              this.$message({
+                message: `发送POST请求到${url}成功，但未返回数据`,
+                type: 'warning'
+              });
+            } else {
+              this.responseDataMap[data.id] = JSON.stringify(response.data, null, 2);
+              this.$message({
+                message: `发送POST请求到${url}成功`,
+                type: 'success'
+              });
+            }
           })
           .catch(error => {
             // 处理错误回调

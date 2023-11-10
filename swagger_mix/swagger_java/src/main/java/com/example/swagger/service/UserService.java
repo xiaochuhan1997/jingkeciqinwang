@@ -6,4 +6,5 @@ import com.example.swagger.entity.User;
 
 
 public interface UserService extends IService<User> {
+    boolean checkUsernameExists(String username);
 }

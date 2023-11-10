@@ -8,8 +8,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -29,6 +32,7 @@ public class UserController {
      * @param user
      * @return
      */
+    @ApiIgnore
     @ApiOperation("登录")
     @PostMapping("/login")
     public R<User> login(HttpServletRequest request, @RequestBody User user) {
@@ -55,6 +59,7 @@ public class UserController {
      *
      * @return
      */
+    @ApiIgnore
     @ApiOperation("退出")
     @PostMapping("/logout")
     public R<String> logout(HttpServletRequest request) {
@@ -69,6 +74,7 @@ public class UserController {
      * @param user
      * @return
      */
+    @ApiIgnore
     @ApiOperation("新增用户")
     @PostMapping
     public R<String> save(HttpServletRequest request, @RequestBody User user) {
@@ -82,6 +88,16 @@ public class UserController {
 
         userService.save(user);
         return R.success("新增员工成功");
+    }
+
+    @ApiOperation("新增普通用户")
+    @PostMapping("/addUsers")
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        if (userService.checkUsernameExists(user.getUsername())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        userService.save(user);
+        return ResponseEntity.ok(user);
     }
 
 

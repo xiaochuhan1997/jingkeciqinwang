@@ -5,9 +5,13 @@
     <el-breadcrumb-item>swagger解析</el-breadcrumb-item>
   </el-breadcrumb>
   <el-card>
-    <el-form :model="paraForm" ref="paraFormRef" label-width="150px" :inline="true">
+    <el-form
+      :model="paraForm"
+      ref="paraFormRef"
+      label-width="150px"
+      :inline="true">
       <el-form-item style='width: 60%' label="swagger API 地址">
-        <el-input v-model="paraForm.url" placeholder="请输入API 地址(http(s)://)">d
+        <el-input v-model="paraForm.url" placeholder="请输入API 地址(http(s)://)" >d
           <template #append>
             <el-button type="primary" icon="Promotion" @click="sent" />
           </template>
@@ -30,28 +34,47 @@
       <el-table-column type="expand" >
         <template #default="props">
           <div m="4">
-            <el-form :inline="true" ref="apiFormRef" :model="props.row" :rules="apiFormRules"
-                     label-width="120px" status-icon :style="{ marginLeft: '20px'}">
+            <el-form
+              :inline="true"
+              ref="apiFormRef"
+              :model="props.row"
+              :rules="apiFormRules"
+              label-width="120px"
+              status-icon :style="{ marginLeft: '20px'}"
+            >
               <el-form-item label="案例号" prop="caseNo" >
-                <el-input v-model="props.row.caseNo" maxlength="50" style="width: 400px" />
+                <el-input v-model="props.row.caseNo" maxlength="50" style="width: 400px" clearable/>
               </el-form-item>
               <el-form-item label="案例描述" prop="caseDec">
-                <el-input v-model="props.row.caseDec" maxlength="100" style="width: 400px"/>
+                <el-input v-model="props.row.caseDec" maxlength="100" style="width: 400px" clearable/>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="showSaveConfirm(props.row)">保存案例</el-button>
               </el-form-item>
               <el-form-item>
-                <codemirror v-model=props.row.inputParam placeholder="Code goes here..."
-                            :style="{ height: '300px',width: '1300px'}" :autofocus="true"
-                            :indent-with-tab="true" :tab-size="2" :extensions="extensions"
-                            @ready="handleReady" @blur="formatJson(props.row)" />
+                <codemirror
+                  v-model=props.row.inputParam
+                  placeholder="Code goes here..."
+                  :style="{ minHeight: '300px', maxHeight: '1500px', width: '1300px'}"
+                  :autofocus="true"
+                  :indent-with-tab="true"
+                  :tab-size="2"
+                  :extensions="extensions"
+                  @ready="handleReady"
+                  @blur="formatJson(props.row)" />
               </el-form-item>
               <el-form-item>
-                <codemirror v-model=props.row.outputParam placeholder="Code goes here..."
-                            :style="{ height: '300px',width: '1300px'}" :autofocus="true"
-                            :indent-with-tab="true" :tab-size="2" :extensions="extensions"
-                            @ready="handleReady" @blur="formatJson(props.row)" />
+                <codemirror
+                  v-model=props.row.outputParam
+                  placeholder="Code goes here..."
+                  :style="{ minHeight: '300px', maxHeight: '1500px', width: '1300px'}"
+                  :autofocus="true"
+                  :indent-with-tab="true"
+                  :tab-size="2"
+                  :extensions="extensions"
+                  @ready="handleReady"
+                  @blur="formatJson(props.row)"
+                />
               </el-form-item>
             </el-form>
           </div>

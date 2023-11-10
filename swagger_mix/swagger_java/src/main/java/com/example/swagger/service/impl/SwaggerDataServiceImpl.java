@@ -22,6 +22,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+
+
 @Service
 public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, SwaggerData> implements SwaggerDataService {
     public static JSONObject root;
@@ -111,6 +113,24 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                 else if (method.equals("post") ) {
                     if (tmp.has("requestBody")){
                         String parameters = tmp.getJSONObject("requestBody").getJSONObject("content").getJSONObject("application/json").get("schema").toString();
+//                        String inputParamTmp = tmp.getJSONObject("requestBody").getJSONObject("content").getJSONObject("application/json").getJSONObject("schema").getJSONObject("$ref").get("properties").toString();
+//                        JSONObject properties = tmp.getJSONObject("requestBody").getJSONObject("content").getJSONObject("application/json").getJSONObject("schema").getJSONObject("$ref").getJSONObject("properties");
+//                        Iterator<String> tempkeys = properties.keys();
+//                        StringBuilder jsonBuilder = new StringBuilder();
+//                        while(tempkeys.hasNext()) {
+//                            String key = tempkeys.next();
+//                            JSONObject property = properties.getJSONObject(key);
+//                            String type = property.getString("type");
+//                            if ("integer".equals(type)) {
+//                                jsonBuilder.append("\"" + key + "\": 0");
+//                            } else {
+//                                jsonBuilder.append("\"" + key + "\": \"\"");
+//                            }
+//                            if(tempkeys.hasNext()) {
+//                                jsonBuilder.append(", ");
+//                            }
+//                        }
+//                        String json = "{" + jsonBuilder.toString() + "}";
                         swaggerData.setInputParam(JsonRefRemover.modifyInput(parameters));
                         if (tmp.getJSONObject("responses").toString().contains("*/*")) {
                             String responses_tmp = tmp.getJSONObject("responses").getJSONObject("200").getJSONObject("content").getJSONObject("*/*").getJSONObject("schema").toString();
