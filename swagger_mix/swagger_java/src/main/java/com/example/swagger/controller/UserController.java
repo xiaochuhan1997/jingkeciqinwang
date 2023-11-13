@@ -92,7 +92,7 @@ public class UserController {
 
     @ApiOperation("新增普通用户")
     @PostMapping("/addUsers")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody User user ) {
         if (userService.checkUsernameExists(user.getUsername())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }

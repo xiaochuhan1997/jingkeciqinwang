@@ -4,15 +4,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.example.swagger.common.R;
 import com.example.swagger.entity.SwaggerData;
 import com.example.swagger.service.SwaggerDataService;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,8 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/swagger")
-
+@Api(value = "Swagger API", description = "SwaggerAPI")
+@Component
 public class SwaggerDataController {
     @Autowired
     private SwaggerDataService swaggerDataService;
@@ -55,7 +57,7 @@ public class SwaggerDataController {
 //        IPage<SwaggerData> pageResult = swaggerDataService.selectSwaggerDataPage(current, size);
         return swaggerDataService.selectSwaggerDataPage(current, size);
     }
-    @ApiIgnore
+
     @DeleteMapping("/deleteRecordforce/{id}")
     public ResponseEntity<String> deleteRecord(@PathVariable Long id) {
         boolean result = swaggerDataService.removeById(id);

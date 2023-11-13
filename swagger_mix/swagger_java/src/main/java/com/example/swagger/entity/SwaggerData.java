@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 public class SwaggerData implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    @ApiModelProperty("id")
+    @ApiModelProperty(hidden = true)
     private Long id;
     @ApiModelProperty("服务器url")
     private String serverUrl;

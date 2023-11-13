@@ -34,8 +34,8 @@ public class Swagger3Config {
                 .enable(true)
                 .select()
                 // 扫描的路径使用@Api的controller
-                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
-                .apis(RequestHandlerSelectors.basePackage("com.example.swagger"))
+//                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+                .apis(RequestHandlerSelectors.basePackage("com.example.swagger.controller"))
                 // 指定路径处理PathSelectors.any()代表所有的路径
                 .paths(PathSelectors.any())
                 .build();

@@ -112,26 +112,42 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                 //解析postpost请求
                 else if (method.equals("post") ) {
                     if (tmp.has("requestBody")){
-                        String parameters = tmp.getJSONObject("requestBody").getJSONObject("content").getJSONObject("application/json").get("schema").toString();
-//                        String inputParamTmp = tmp.getJSONObject("requestBody").getJSONObject("content").getJSONObject("application/json").getJSONObject("schema").getJSONObject("$ref").get("properties").toString();
-//                        JSONObject properties = tmp.getJSONObject("requestBody").getJSONObject("content").getJSONObject("application/json").getJSONObject("schema").getJSONObject("$ref").getJSONObject("properties");
-//                        Iterator<String> tempkeys = properties.keys();
-//                        StringBuilder jsonBuilder = new StringBuilder();
-//                        while(tempkeys.hasNext()) {
-//                            String key = tempkeys.next();
-//                            JSONObject property = properties.getJSONObject(key);
-//                            String type = property.getString("type");
-//                            if ("integer".equals(type)) {
-//                                jsonBuilder.append("\"" + key + "\": 0");
-//                            } else {
-//                                jsonBuilder.append("\"" + key + "\": \"\"");
-//                            }
-//                            if(tempkeys.hasNext()) {
-//                                jsonBuilder.append(", ");
-//                            }
-//                        }
-//                        String json = "{" + jsonBuilder.toString() + "}";
-                        swaggerData.setInputParam(JsonRefRemover.modifyInput(parameters));
+                        JSONObject properties = Optional.ofNullable(tmp.optJSONObject("requestBody"))
+                                .map(jsonObject -> jsonObject.optJSONObject("content"))
+                                .map(jsonObject -> jsonObject.optJSONObject("application/json"))
+                                .map(jsonObject -> jsonObject.optJSONObject("schema"))
+                                .map(jsonObject -> jsonObject.optJSONObject("$ref"))
+                                .map(jsonObject -> jsonObject.optJSONObject("properties"))
+                                .orElseGet(() -> {
+                                    // 如果properties对象不存在，那么根据parameters的值来创建properties对象
+                                    // ...
+                                    return new JSONObject(); // 初始化properties对象;
+
+                                });
+                        String json;
+                        if (properties.keys().hasNext()){
+
+
+                        Iterator<String> tempkeys = properties.keys();
+                        StringBuilder jsonBuilder = new StringBuilder();
+                        while(tempkeys.hasNext()) {
+                            String key = tempkeys.next();
+                            JSONObject property = properties.getJSONObject(key);
+                            String type = property.getString("type");
+                            if ("integer".equals(type)) {
+                                jsonBuilder.append("\"" + key + "\": 0");
+                            } else {
+                                jsonBuilder.append("\"" + key + "\": \"\"");
+                            }
+                            if(tempkeys.hasNext()) {
+                                jsonBuilder.append(", ");
+                            }
+                        }
+                         json = "{" + jsonBuilder + "}";}
+                        else{
+                            json = tmp.getJSONObject("requestBody").getJSONObject("content").getJSONObject("application/json").get("schema").toString();
+                        }
+                        swaggerData.setInputParam(JsonRefRemover.modifyInput(json));
                         if (tmp.getJSONObject("responses").toString().contains("*/*")) {
                             String responses_tmp = tmp.getJSONObject("responses").getJSONObject("200").getJSONObject("content").getJSONObject("*/*").getJSONObject("schema").toString();
                             String responses = StringEscapeUtils.unescapeJavaScript(responses_tmp);

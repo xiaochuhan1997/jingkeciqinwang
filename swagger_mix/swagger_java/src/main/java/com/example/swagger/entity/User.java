@@ -2,17 +2,20 @@ package com.example.swagger.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty(value = "id")
+    @ApiModelProperty(hidden=true)
+//    @ApiModelProperty(value = "id")
     private Long id;
 
     @ApiModelProperty(value = "用户名")
@@ -27,20 +30,17 @@ public class User implements Serializable {
     @ApiModelProperty(value = "状态")
     private Integer status;
 
-    @TableField(fill = FieldFill.INSERT)
-    @ApiModelProperty(value = "创建时间")
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    @TableField(fill = FieldFill.INSERT )
+    @JsonProperty("create_Time")
+    @ApiModelProperty(value = "创建时间", name = "createTime", hidden = true)
     private LocalDateTime createTime;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    @ApiModelProperty(value = "更新时间")
+    @JsonProperty("update_Time" )
+    @ApiModelProperty(value = "更新时间", name = "updateTime",hidden = true)
     private LocalDateTime updateTime;
-
-//    @TableField(fill = FieldFill.INSERT)
-//    @ApiModelProperty(value = "创建人")
-//    private Long createUser;
-//
-//    @ApiModelProperty(value = "更新人")
-//    @TableField(fill = FieldFill.INSERT_UPDATE)
-//    private Long updateUser;
 
 }
