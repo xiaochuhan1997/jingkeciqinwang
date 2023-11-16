@@ -23,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api")
-@Api(value = "测试apiController",tags = {"接口"})
+@Api(value = "测试apiController",tags = {"测试标签"})
 public class ApiController {
     @Data
     public static class Request implements Serializable {

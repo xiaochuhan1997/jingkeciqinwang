@@ -3,6 +3,7 @@ package com.example.swagger.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.swagger.common.R;
 import com.example.swagger.entity.User;
+import com.example.swagger.entity.UserDetail;
 import com.example.swagger.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
+
+import java.util.List;
 
 @Api(tags = "用户管理")
 @Slf4j
@@ -98,6 +100,12 @@ public class UserController {
         }
         userService.save(user);
         return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/saveUsers")
+    public void saveUser(@RequestBody User user, List<UserDetail> userDetailList) {
+        userService.saveUser(user, userDetailList);
+
     }
 
 

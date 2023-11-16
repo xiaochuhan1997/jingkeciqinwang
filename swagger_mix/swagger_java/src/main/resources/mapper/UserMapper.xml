@@ -1,0 +1,25 @@
+<mapper namespace="com.example.mapper.UserMapper">
+    <resultMap id="UserWithDetailMap" type="User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="name" column="name"/>
+        <result property="password" column="password"/>
+        <result property="status" column="status"/>
+        <collection property="userDetailList" ofType="UserDetail">
+            <id property="id" column="detail_id"/>
+            <result property="userId" column="user_id"/>
+            <!-- 其他属性的映射 -->
+        </collection>
+        <!-- 其他属性的映射 -->
+    </resultMap>
+
+    <select id="selectUserWithDetail" resultMap="UserWithDetailMap">
+        SELECT u.id, u.username, u.name, u.password, u.status,
+        d.id as detail_id, d.user_id, d.dhr_id, d.num_id,
+        d.org_name, d.org_no, d.usap_id, d.user_mobile,
+        d.user_name, d.wecom_user_id
+        FROM user u
+        LEFT JOIN user_detail d ON u.id = d.user_id
+        WHERE u.id = #{id}
+    </select>
+</mapper>

@@ -10,6 +10,7 @@ import lombok.Data;
 import javax.persistence.Column;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class User implements Serializable {
@@ -42,5 +43,8 @@ public class User implements Serializable {
     @JsonProperty("update_Time" )
     @ApiModelProperty(value = "更新时间", name = "updateTime",hidden = true)
     private LocalDateTime updateTime;
+
+    @ApiModelProperty(value = "用户详细信息列表")
+    private List<UserDetail> userDetailList;
 
 }
