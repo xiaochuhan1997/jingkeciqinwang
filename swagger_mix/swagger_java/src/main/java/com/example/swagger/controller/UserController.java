@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.swagger.common.R;
 import com.example.swagger.entity.User;
 import com.example.swagger.entity.UserDetail;
+import com.example.swagger.mapper.UserDetailMapper;
+import com.example.swagger.service.UserDetailService;
 import com.example.swagger.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,6 +28,11 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserDetailService userDetailService;
+    @Autowired
+    private UserDetailMapper userDetailMapper;
 
     /**
      * 员工登录
@@ -91,7 +98,7 @@ public class UserController {
         userService.save(user);
         return R.success("新增员工成功");
     }
-
+    @ApiIgnore
     @ApiOperation("新增普通用户")
     @PostMapping("/addUsers")
     public ResponseEntity<User> createUser(@RequestBody User user ) {
@@ -101,12 +108,16 @@ public class UserController {
         userService.save(user);
         return ResponseEntity.ok(user);
     }
-
+    @ApiIgnore
     @PostMapping("/saveUsers")
-    public void saveUser(@RequestBody User user, List<UserDetail> userDetailList) {
-        userService.saveUser(user, userDetailList);
-
+    public String createUser(@RequestBody List<UserDetail> userDetailList) {
+        userDetailService.saveBatch(userDetailList);
+        return "User created";
     }
 
+    @PostMapping("/testCreate")
+    public String testCreate(@RequestBody User user) {
 
+        return userService.testCreate(user);
+    }
 }

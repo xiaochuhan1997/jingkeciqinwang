@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * 配置MP的分页插件
  */
 @Configuration
-@MapperScan("com.example.swagger.mapper")
+//@MapperScan("com.example.swagger.mapper")
 public class MybatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {

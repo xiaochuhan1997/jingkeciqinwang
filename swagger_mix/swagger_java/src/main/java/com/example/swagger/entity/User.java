@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.Column;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,6 +44,7 @@ public class User implements Serializable {
     private LocalDateTime updateTime;
 
     @ApiModelProperty(value = "用户详细信息列表")
+    @TableField(exist = false)
     private List<UserDetail> userDetailList;
 
 }

@@ -6,10 +6,11 @@ import com.example.swagger.entity.UserDetail;
 
 import java.util.List;
 
-
 public interface UserService extends IService<User> {
     boolean checkUsernameExists(String username);
-    void saveUser(User user, List<UserDetail> userDetailList);
+//    void saveUser(User user, List<UserDetail> userDetailList);
+    void createUser(List<UserDetail> userDetailList);
 
 
+    String testCreate(User user);
 }

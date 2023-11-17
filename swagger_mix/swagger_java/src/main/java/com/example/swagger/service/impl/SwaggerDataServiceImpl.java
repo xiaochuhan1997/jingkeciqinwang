@@ -4,23 +4,20 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.SerializationUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.swagger.utils.JsonRefRemover;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.swagger.entity.SwaggerData;
 import com.example.swagger.mapper.SwaggerDataMapper;
 import com.example.swagger.service.SwaggerDataService;
+import com.example.swagger.utils.JsonRefRemover;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
-//import org.apache.commons.lang3.SerializationUtils;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -141,7 +138,8 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                                     String type = property.getString("type");
                                     if ("integer".equals(type)) {
                                         jsonBuilder.append("\"" + key + "\": 0");
-                                    } else if ("array".equals(type)&(property.has("items"))) {
+                                    }
+                                    else if ("array".equals(type)&(property.has("items"))) {
                                             JSONObject items = property.getJSONObject("items");
                                             if (items.has("enum")) {
                                                 JSONArray enumValues = items.getJSONArray("enum");
@@ -157,7 +155,8 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                                         else {
                                             jsonBuilder.append("\"" + key + "\": \"\"");
                                         }
-                                } else {
+                                }
+                                    else {
                                         jsonBuilder.append("\"" + key + "\": \"\"");
                                     }
                                     if (tempkeys.hasNext()) {
