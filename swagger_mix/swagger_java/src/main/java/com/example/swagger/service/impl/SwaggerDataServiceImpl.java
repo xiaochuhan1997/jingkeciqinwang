@@ -81,10 +81,7 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                                parameters.put(jsonObject.getString("name"), "");
                             }
                         }
-                        String result1 = parameters.toString();
-//                        System.out.println(result1);
                         // 提取第二个 JSON 对象的 name 字段，并生成新的 JSON 字符串 就是描述
-
                         JSONArray parametersDec = new JSONArray();
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -126,38 +123,54 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
 
                                     });
                             String propertiesToJson = properties.toString();
-                            properties= JSONObject.fromObject(JsonRefRemover.modifyInput(propertiesToJson));
+                            properties = JSONObject.fromObject(JsonRefRemover.modifyInput(propertiesToJson));
                             String json;
                             if (properties.keys().hasNext()) {
-
-                                Iterator<String> tempkeys = properties.keys();
                                 StringBuilder jsonBuilder = new StringBuilder();
-                                while (tempkeys.hasNext()) {
+                                for (Iterator<String> tempkeys = properties.keys(); tempkeys.hasNext(); ) {
                                     String key = tempkeys.next();
                                     JSONObject property = properties.getJSONObject(key);
                                     String type = property.getString("type");
                                     if ("integer".equals(type)) {
-                                        jsonBuilder.append("\"" + key + "\": 0");
-                                    }
-                                    else if ("array".equals(type)&(property.has("items"))) {
-                                            JSONObject items = property.getJSONObject("items");
-                                            if (items.has("enum")) {
-                                                JSONArray enumValues = items.getJSONArray("enum");
-                                                jsonBuilder.append("\"" + key + "\": [");
-                                                for (int i = 0; i < enumValues.size(); i++) {
-                                                    jsonBuilder.append("\"" + enumValues.getString(i) + "\"");
-                                                    if (i < enumValues.size() - 1) {
-                                                        jsonBuilder.append(", ");
-                                                    }
+                                        jsonBuilder.append(String.format("\"%s\": 0", key));
+                                    } else if ("array".equals(type) && property.has("items")) {
+                                        JSONObject items = property.getJSONObject("items");
+                                        if (items.has("enum")) {//array中含有枚举类型的情况
+                                            JSONArray enumValues = items.getJSONArray("enum");
+                                            jsonBuilder.append("\"" + key + "\": [");
+                                            for (int i = 0; i < enumValues.size(); i++) {
+                                                jsonBuilder.append("\"" + enumValues.getString(i) + "\"");
+                                                if (i < enumValues.size() - 1) {
+                                                    jsonBuilder.append(", ");
                                                 }
-                                                jsonBuilder.append("]");
                                             }
-                                        else {
-                                            jsonBuilder.append("\"" + key + "\": \"\"");
+                                            jsonBuilder.append("]");
+                                        } else if (items.has("properties")) {
+                                            jsonBuilder.append(String.format("\"%s\": [{", key));
+                                            JSONObject propertiesValues = items.getJSONObject("properties");
+                                            for (Iterator<String> propertiesTempKeys = propertiesValues.keys(); propertiesTempKeys.hasNext(); ) {
+                                                String listKey = propertiesTempKeys.next();
+                                                JSONObject property2 = propertiesValues.getJSONObject(listKey);
+                                                String listType = property2.getString("type");
+                                                if ("integer".equals(listType)) {
+                                                    jsonBuilder.append(String.format("\"%s\": 0", listKey));
+                                                } else {
+                                                    jsonBuilder.append(String.format("\"%s\": \"\"", listKey));
+                                                }
+                                                if (propertiesTempKeys.hasNext()) {
+                                                    jsonBuilder.append(", ");
+                                                }
+                                            }
+                                            jsonBuilder.append("}]");
                                         }
-                                }
-                                    else {
-                                        jsonBuilder.append("\"" + key + "\": \"\"");
+                                        else if("string".equals(items.getString("type"))){
+                                            jsonBuilder.append(String.format("\"%s\": [\"%s\"]", key, "string"));
+                                        }
+                                        else {
+                                            jsonBuilder.append(String.format("\"%s\": \"\"", key));
+                                        }
+                                    } else {
+                                        jsonBuilder.append(String.format("\"%s\": \"\"", key));
                                     }
                                     if (tempkeys.hasNext()) {
                                         jsonBuilder.append(", ");
