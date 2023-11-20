@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @RestController
+@ApiIgnore
 @RequestMapping("/swagger")
 @Api(value = "Swagger API", description = "SwaggerAPI")
 @Component
