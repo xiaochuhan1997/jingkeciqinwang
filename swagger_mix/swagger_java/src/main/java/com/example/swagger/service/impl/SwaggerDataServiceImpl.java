@@ -65,20 +65,17 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                     if (method.equals("get") && tmp.has("parameters")) {
                         // 需要将输入参数分割为参数和描述
                         String parametersTmp = tmp.get("parameters").toString();
-
                         // 将 JSON 字符串转换为 JSONArray 对象
                         JSONArray jsonArray = JSONArray.fromObject(parametersTmp);
-
                         // 提取第一个 JSON 对象的 name 字段，并生成新的 JSON 字符串 就是参数
                         JSONObject parameters = new JSONObject();
-
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            if (jsonObject.getJSONObject("schema").getString("type").equals("integer")){
+                            if (jsonObject.getJSONObject("schema").getString("type").equals("integer")) {
                                 //integer类型赋默认值0
                                 parameters.put(jsonObject.getString("name"), 0);
-                            }else {
-                               parameters.put(jsonObject.getString("name"), "");
+                            } else {
+                                parameters.put(jsonObject.getString("name"), "");
                             }
                         }
                         // 提取第二个 JSON 对象的 name 字段，并生成新的 JSON 字符串 就是描述
@@ -104,8 +101,6 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                             String responses = tmp.getJSONObject("responses").getJSONObject("200").getJSONObject("content").getJSONObject("application/json").getJSONObject("schema").getJSONObject("$ref").toString();
                             swaggerData.setOutputParam(JsonRefRemover.modifyInput(responses));
                         }
-
-
                     }
                     //解析postpost请求
                     else if (method.equals("post")) {
@@ -162,11 +157,9 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                                                 }
                                             }
                                             jsonBuilder.append("}]");
-                                        }
-                                        else if("string".equals(items.getString("type"))){
+                                        } else if ("string".equals(items.getString("type"))) {
                                             jsonBuilder.append(String.format("\"%s\": [\"%s\"]", key, "string"));
-                                        }
-                                        else {
+                                        } else {
                                             jsonBuilder.append(String.format("\"%s\": \"\"", key));
                                         }
                                     } else {
@@ -196,7 +189,6 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
                     tempList.add(swaggerData);
                     // 获取templist的最后一条数据/最新add的数据
                     SwaggerData lastData = tempList.get(tempList.size() - 1);
-
                     // 进行深拷贝，并将拷贝后的数据添加到swaggerDataList中
                     SwaggerData copiedData = deepCopy(lastData);
                     swaggerDataList.add(copiedData);
@@ -218,7 +210,6 @@ public class SwaggerDataServiceImpl extends ServiceImpl<SwaggerDataMapper, Swagg
         }
         return swaggerDataList;
     }
-
 
     public static String getJson() {
 
